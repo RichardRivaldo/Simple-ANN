@@ -21,6 +21,28 @@ class ArtificialNeuralNetwork:
         self.features = self.get_features()
         self.target = self.get_target()
 
+        # Set the properties of the neural network
+        # Set number of nodes in every layers
+        # The input layer will have number of features nodes, the output will be 1
+        # and the hidden layer will have half of the number of features nodes ceiled
+        num_of_features = self.features.shape[1]
+        self.layers_nodes = [num_of_features, int(np.ceil(num_of_features / 2)), 1]
+
+        # Initialized the weights and biases hyperparameters
+        # Use Numpy Randn to initialize random normal-distributed values to array with given dims
+
+        # Initialize weights except for output layer
+        # The neural networks will be dense, meaning that each hidden layer nodes will have
+        # connections to each input layers. Therefore, if num_of_features = n,
+        # the dims of the weights will be ceil(n/2) x n for input-hidden layer
+        # and number of nodes in the output layer (1) x (n/2) for hidden-output layer
+        self.weights = [
+            np.random.randn(m, n)
+            for m, n in zip(self.layers_nodes[1:], self.layers_nodes[:-1])
+        ]
+        # Initialize only biases for non-input layer nodes
+        self.biases = [np.random.randn(layers, 1) for layers in self.layers_nodes[1:]]
+
     # Read the dataset
     def read_dataset(self, dataset):
         dataset = pd.read_csv(dataset)
