@@ -151,7 +151,7 @@ class ArtificialNeuralNetwork:
 
     # Feed Forward Propagation
     # Default cost used: MSE
-    def propagate_forward(self, X, y, cost="MSE"):
+    def propagate_forward(self, X, y, cost):
         # Initialize empty list attribute for activations and Z Value
         self.z_values = []
         self.activations = []
@@ -231,7 +231,7 @@ class ArtificialNeuralNetwork:
         self.bias_grad.append(dl_b2)
 
     # Update the hyperparameters with certain learning rate
-    def update_hyperparameters(self, lr=0.3):
+    def update_hyperparameters(self, lr):
         # Iterate over all elements in range of all weights
         # Since the biases will have same elements as weights,
         # the update can be applied in one loop
@@ -240,3 +240,80 @@ class ArtificialNeuralNetwork:
             self.weights[i] -= lr * self.weight_grad[i]
             # Update the bias of the Neural Network
             self.biases[i] -= lr * self.bias_grad[i]
+
+    # Get random samples from the data
+    def get_samples(self, batch_size):
+        # Shuffle random indices of data based on the batch size
+        sgd_samples = np.random.randint(len(self.features), size=batch_size)
+
+        # Get the features of the corresponding indices
+        X = np.take(self.features, sgd_samples)
+
+        # Get the target of the corresponding indices
+        y = np.take(self.target, sgd_samples)
+
+        return X, y
+
+    # Fit and train the Neural Network with Stochastic Gradient Descent Method
+    def fit_train(self, lr=0.1, epochs=1000, batch_size=1, cost="MSE"):
+        print("Training Session...")
+
+        # Iterate over all epochs
+        for epoch in range(epochs):
+            # Get random batch sized samples of the dataset
+            sample_X, sample_y = self.get_samples(batch_size)
+
+            # Iterate over all given samples
+            for X, y in list(zip(sample_X, sample_y)):
+                # Propagate the inputs forward and get the y hat + losses
+                y_hat, loss = self.propagate_forward(np.array(X), np.array(y), cost)
+
+                # Propagate the outputs backward and calculate the gradients
+                self.propagate_backward(np.array(X), np.array(y), y_hat)
+
+                # Adjust weights and biases based on the calculation before
+                self.update_hyperparameters(lr)
+
+                # Trace the current epoch and loss at every iteration
+                print(f"Epoch: {epoch + 1}/{epochs}, Loss: {loss}")
+
+    # Get random input data from the test dataset
+    def get_random_input(self):
+        # Random an index to choose with
+        data_idx = np.random.randint(len(self.test_set))
+
+        # Get the test data of the corresponding index
+        return self.test_set[data_idx]
+
+    # Predict and classify a data
+    def predict(self, input_data):
+        # Get the z value of the hidden layer
+        z_value = input_data.dot(self.weights[0]) + self.biases[0]
+
+        # Apply the activation function to the z value
+        act_value = self.relu(z_value)
+
+        # Get the z value output of the last layer
+        output = act_value.dot(self.weights[-1]) + self.biases[-1]
+
+        # Apply the activation function to the z value output
+        prob = self.sigmoid(output)
+
+        # Return true for the label if the probability is more than 0.5
+        return prob >= 0.5
+
+    # Output the prediction
+    def output_predict(self):
+        # Get random input data
+        input_data = self.get_random_input()
+
+        # Output the predicted data
+        print("Input Data:")
+        print(input_data[:-1])
+
+        # Get prediction
+        prediction = self.predict(input_data)
+
+        # Output the expected predicted churn value
+        print("Expected Label: %d" % (input_data[-1]))
+        print("Predicted Label: %d" % prediction)
