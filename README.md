@@ -12,7 +12,7 @@ The neurons can then be stacked to each other, and the stack will be called `lay
 
 In this model, there will be three main algorithms applied iteratively while fitting and training the model. They are `Forward Propagation`, `Backward Propagation`, and `Weight Updating`. `Forward Propagation` is about propagating the input forward from the input layer through the `Activation Function`.
 
-Conversely, `Backward Propagation` uses all values obtained in the step before and tries to calculate the slope or gradient by comparing real values from the dataset with values from `Forward Propagation`. Lastly, the model will use the gradient to descend and minimize the `Loss`, and such will be called `Gradient Descent`.
+Conversely, `Backward Propagation` uses all values obtained in the step before and tries to calculate the slope or gradient by comparing real values from the dataset with values from `Forward Propagation`. Lastly, the model will use the gradient to descend and minimize the `Loss` by adjusting `weights` and `biases` in every neurons, and such will be called `Gradient Descent`.
 
 The model in this implementation will consist of only one hidden layer. The number of neurons in each layers are pre-determined in the algorithm. The values that can be adjusted in the algorithm are `Learning Rate`, `Epochs`, and `Batch Size` used in the `Stochastic Gradient Descent` optimization.
 
