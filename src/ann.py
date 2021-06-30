@@ -1,13 +1,3 @@
-# Implementasikan ketiga bagian dari ANN:
-# Forward Propagation
-# Back Propagation
-# Updating Weight
-# Algoritma yang dibuat, minimal dapat:
-# Menerima optimizer Stochastic Gradient Descent (SGD)
-# Menerima loss function MSE
-# Dapat menerima activation function sigmoid dan relu
-# Mengkategorikan label binary (True False)
-
 # Libraries
 import pandas as pd
 import numpy as np
@@ -31,21 +21,21 @@ class ArtificialNeuralNetwork:
         self.weights = self.init_weights()
         self.biases = self.init_biases()
 
-        # Automatically fit and train the Neural Network to the dataset
-        self.fit_train()
-
     # Read the dataset
     def read_dataset(self, dataset):
-        dataset = pd.read_csv(dataset)
+        # Read the dataset
+        dataset = pd.read_csv(dataset).to_numpy()
+        # Shuffle the dataset
+        np.random.shuffle(dataset)
         return dataset
 
     # Get the features of the dataset in form of Numpy array
     def get_features(self, n_data=280):
-        return self.dataset.iloc[:n_data, :-1].to_numpy()
+        return self.dataset[:n_data, :-1]
 
     # Get the target of the dataset in form of Numpy array
     def get_target(self, n_data=280):
-        target = self.dataset.iloc[:n_data, -1].to_numpy()
+        target = self.dataset[:n_data, -1]
         return np.reshape(target, (len(target), 1))
 
     # Get the test set of the dataset in form of Numpy array
@@ -54,7 +44,7 @@ class ArtificialNeuralNetwork:
         start_idx = len(self.features)
 
         # Slice the rest of the dataset starting from the start index
-        return self.dataset.iloc[start_idx:, :].to_numpy()
+        return self.dataset[start_idx:, :]
 
     # Initialize the number of nodes in the network's layers
     def init_layers_nodes(self):
@@ -131,6 +121,7 @@ class ArtificialNeuralNetwork:
     # Cross Entropy Cost Function
     # In the case of binary classification, this cost function should be used instead of MSE
     # ***The implementation is prone to overflow error and miscalculation***
+    # ***Doesn't work with the SGD :(***
     def cross_entropy(self, y, y_hat):
         # Calculate inverse
         y_inv = 1.0 - y
@@ -274,8 +265,8 @@ class ArtificialNeuralNetwork:
                 # Adjust weights and biases based on the calculation before
                 self.update_hyperparameters(lr)
 
-                # Trace the current epoch and loss at every iteration
-                print(f"Epoch: {epoch + 1}/{epochs}, Loss: {loss}")
+            # Trace the current epoch and loss at every iteration
+            print(f"Epoch: {epoch + 1}/{epochs}, Loss: {loss}")
 
     # Get random input data from the test dataset
     def get_random_input(self):
@@ -300,7 +291,7 @@ class ArtificialNeuralNetwork:
         prob = self.sigmoid(output)
 
         # Return true for the label if the probability is more than 0.5
-        return prob >= 0.5
+        return prob > 0.5
 
     # Output the prediction
     def output_predict(self):
@@ -312,7 +303,7 @@ class ArtificialNeuralNetwork:
         print(input_data[:-1])
 
         # Get prediction
-        prediction = self.predict(input_data)
+        prediction = self.predict(input_data[:-1])
 
         # Output the expected predicted churn value
         print("Expected Label: %d" % (input_data[-1]))
